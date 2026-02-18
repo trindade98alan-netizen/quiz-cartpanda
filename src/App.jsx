@@ -164,6 +164,25 @@ function useCountdown(startSeconds = 600) {
 }
 
 export default function App() {
+  /**
+   * ✅ PIXEL DA UTMIFY (SUBSTITUI O PIXEL DIRETO DO FACEBOOK)
+   * - Carrega uma vez ao abrir o quiz
+   * - Evita duplicação de eventos
+   */
+  useEffect(() => {
+    // evita duplicar se o React re-renderizar por algum motivo
+    if (document.getElementById("utmify-pixel")) return;
+
+    window.pixelId = "699614ad82a0524f32b41086";
+
+    const a = document.createElement("script");
+    a.id = "utmify-pixel";
+    a.async = true;
+    a.defer = true;
+    a.src = "https://cdn.utmify.com.br/scripts/pixel/pixel.js";
+    document.head.appendChild(a);
+  }, []);
+
   const [stage, setStage] = useState("hook"); // hook | quiz | offers
   const [current, setCurrent] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -285,14 +304,12 @@ function OffersPage({ totalScore, maxScore }) {
   return (
     <div style={styles.page}>
       <div style={{ ...styles.card, padding: 18 }}>
-        {/* Contador */}
         <div style={offersStyles.timerWrap}>
           <div style={offersStyles.timerText}>
             GARANTA AGORA COM DESCONTO <span style={offersStyles.timer}>{time}</span>
           </div>
         </div>
 
-        {/* Topo: Planilha (somente imagem) */}
         <div style={offersStyles.heroSoloWrap}>
           <img
             src="/planilha.png"
@@ -304,7 +321,6 @@ function OffersPage({ totalScore, maxScore }) {
           />
         </div>
 
-        {/* Cabeçalho */}
         <div style={{ textAlign: "center", marginTop: 14 }}>
           <div style={offersStyles.headerTag}>ESCOLHA SUA MELHOR OPÇÃO</div>
           <div style={offersStyles.headerTitle}>Seu diagnóstico está pronto ✅</div>
@@ -316,14 +332,12 @@ function OffersPage({ totalScore, maxScore }) {
           </div>
         </div>
 
-        {/* Cards */}
         <div style={offersStyles.grid}>
           {offers.map((o, idx) => (
             <OfferCard key={idx} offer={o} />
           ))}
         </div>
 
-        {/* Garantia */}
         <img
           src="/garantia.png"
           alt="Garantia 30 dias"
@@ -333,7 +347,6 @@ function OffersPage({ totalScore, maxScore }) {
           }}
         />
 
-        {/* Depoimentos */}
         <div style={{ marginTop: 18 }}>
           <h3 style={offersStyles.h3}>RELATOS DE QUEM ADQUIRIU</h3>
           {testimonials.map((t, i) => (
@@ -357,7 +370,6 @@ function OfferCard({ offer }) {
       <div style={offersStyles.cardTitle}>{offer.title}</div>
       <div style={offersStyles.cardSubtitle}>{offer.subtitle}</div>
 
-      {/* Imagem do card (9:16) */}
       <div style={offersStyles.cardImageWrap}>
         <img
           src={offer.image}
@@ -374,7 +386,6 @@ function OfferCard({ offer }) {
         <div style={offersStyles.newPrice}>Por: {offer.newPrice}</div>
       </div>
 
-      {/* Bullets */}
       {offer.bullets?.length > 0 && (
         <ul style={offersStyles.bullets}>
           {offer.bullets.map((b, i) => (
@@ -385,19 +396,20 @@ function OfferCard({ offer }) {
         </ul>
       )}
 
-      {/* ✅ AQUI ESTÁ A CORREÇÃO: repassar UTMs/fbclid/etc pro checkout */}
+      {/* ✅ preserva UTMs do quiz no clique para o checkout */}
       <button
         style={offersStyles.buyBtn}
         onClick={() => {
-          // pega tudo que veio no link do anúncio (utm_*, fbclid etc)
-          const params = window.location.search; // ex: ?utm_source=...&utm_campaign=...&fbclid=...
-
+          const params = window.location.search; // pega ?utm_...
           const baseUrl = offer.url;
 
-          // monta a URL final sem perder os parâmetros
-          const finalUrl = params
-            ? baseUrl + (baseUrl.includes("?") ? "&" : "?") + params.slice(1)
-            : baseUrl;
+          let finalUrl = baseUrl;
+          if (params) {
+            finalUrl =
+              baseUrl +
+              (baseUrl.includes("?") ? "&" : "?") +
+              params.replace("?", "");
+          }
 
           window.location.href = finalUrl;
         }}
