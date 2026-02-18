@@ -69,9 +69,6 @@ const questions = [
 
 /* =========================
    OFERTAS (3 cards)
-   - card3 é MAIS POPULAR
-   - imagens card1/card2/card3 em 9:16
-   - topo da página: somente /planilha.png (sem mockup)
 ========================= */
 const offers = [
   {
@@ -288,12 +285,14 @@ function OffersPage({ totalScore, maxScore }) {
   return (
     <div style={styles.page}>
       <div style={{ ...styles.card, padding: 18 }}>
+        {/* Contador */}
         <div style={offersStyles.timerWrap}>
           <div style={offersStyles.timerText}>
             GARANTA AGORA COM DESCONTO <span style={offersStyles.timer}>{time}</span>
           </div>
         </div>
 
+        {/* Topo: Planilha (somente imagem) */}
         <div style={offersStyles.heroSoloWrap}>
           <img
             src="/planilha.png"
@@ -305,6 +304,7 @@ function OffersPage({ totalScore, maxScore }) {
           />
         </div>
 
+        {/* Cabeçalho */}
         <div style={{ textAlign: "center", marginTop: 14 }}>
           <div style={offersStyles.headerTag}>ESCOLHA SUA MELHOR OPÇÃO</div>
           <div style={offersStyles.headerTitle}>Seu diagnóstico está pronto ✅</div>
@@ -316,12 +316,14 @@ function OffersPage({ totalScore, maxScore }) {
           </div>
         </div>
 
+        {/* Cards */}
         <div style={offersStyles.grid}>
           {offers.map((o, idx) => (
             <OfferCard key={idx} offer={o} />
           ))}
         </div>
 
+        {/* Garantia */}
         <img
           src="/garantia.png"
           alt="Garantia 30 dias"
@@ -331,6 +333,7 @@ function OffersPage({ totalScore, maxScore }) {
           }}
         />
 
+        {/* Depoimentos */}
         <div style={{ marginTop: 18 }}>
           <h3 style={offersStyles.h3}>RELATOS DE QUEM ADQUIRIU</h3>
           {testimonials.map((t, i) => (
@@ -347,32 +350,6 @@ function OfferCard({ offer }) {
     ? { ...offersStyles.card, ...offersStyles.cardHighlight }
     : offersStyles.card;
 
-  // ✅ FUNÇÃO: repassa UTMs + qualquer parâmetro (fbclid, gclid etc.) pro checkout
-  function goToCheckout() {
-    const params = window.location.search; // "?utm_source=...&utm_campaign=...&fbclid=..."
-    const baseUrl = offer.url;
-
-    const finalUrl = params
-      ? baseUrl + (baseUrl.includes("?") ? "&" : "?") + params.slice(1)
-      : baseUrl;
-
-    onClick={() => {
-  const params = window.location.search; // pega ?utm_source=... da URL do quiz
-  const baseUrl = offer.url;
-
-  let finalUrl = baseUrl;
-
-  if (params) {
-    finalUrl =
-      baseUrl +
-      (baseUrl.includes("?") ? "&" : "?") +
-      params.replace("?", "");
-  }
-
-  window.location.href = finalUrl;
-}}
-  }
-
   return (
     <div style={cardStyle}>
       {offer.highlight && <div style={offersStyles.popular}>MAIS POPULAR</div>}
@@ -380,6 +357,7 @@ function OfferCard({ offer }) {
       <div style={offersStyles.cardTitle}>{offer.title}</div>
       <div style={offersStyles.cardSubtitle}>{offer.subtitle}</div>
 
+      {/* Imagem do card (9:16) */}
       <div style={offersStyles.cardImageWrap}>
         <img
           src={offer.image}
@@ -396,6 +374,7 @@ function OfferCard({ offer }) {
         <div style={offersStyles.newPrice}>Por: {offer.newPrice}</div>
       </div>
 
+      {/* Bullets */}
       {offer.bullets?.length > 0 && (
         <ul style={offersStyles.bullets}>
           {offer.bullets.map((b, i) => (
@@ -406,7 +385,23 @@ function OfferCard({ offer }) {
         </ul>
       )}
 
-      <button style={offersStyles.buyBtn} onClick={goToCheckout}>
+      {/* ✅ AQUI ESTÁ A CORREÇÃO: repassar UTMs/fbclid/etc pro checkout */}
+      <button
+        style={offersStyles.buyBtn}
+        onClick={() => {
+          // pega tudo que veio no link do anúncio (utm_*, fbclid etc)
+          const params = window.location.search; // ex: ?utm_source=...&utm_campaign=...&fbclid=...
+
+          const baseUrl = offer.url;
+
+          // monta a URL final sem perder os parâmetros
+          const finalUrl = params
+            ? baseUrl + (baseUrl.includes("?") ? "&" : "?") + params.slice(1)
+            : baseUrl;
+
+          window.location.href = finalUrl;
+        }}
+      >
         Quero esse
       </button>
     </div>
