@@ -356,7 +356,21 @@ function OfferCard({ offer }) {
       ? baseUrl + (baseUrl.includes("?") ? "&" : "?") + params.slice(1)
       : baseUrl;
 
-    window.location.href = finalUrl;
+    onClick={() => {
+  const params = window.location.search; // pega ?utm_source=... da URL do quiz
+  const baseUrl = offer.url;
+
+  let finalUrl = baseUrl;
+
+  if (params) {
+    finalUrl =
+      baseUrl +
+      (baseUrl.includes("?") ? "&" : "?") +
+      params.replace("?", "");
+  }
+
+  window.location.href = finalUrl;
+}}
   }
 
   return (
