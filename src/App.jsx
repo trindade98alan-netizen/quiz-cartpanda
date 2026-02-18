@@ -111,20 +111,18 @@ const offers = [
     url: "https://nobux.mycartpanda.com/checkout/207386927:1",
     image: "/card3.png",
     bullets: [
-      // ✅ NOVO: primeiro bullet (SUporte humanizado)
       "Suporte prioritário humanizado no WhatsApp (pegamos na sua mão e te ajudamos até você ver as coisas acontecendo).",
       "Planilha Vida Sem Dívidas, criada para ajudar você a organizar suas finanças de forma simples, rápida e prática.",
       "ANTI-IMPULSO: antes de gastar, pergunte para a IA. Funciona direto pelo ChatGPT e te ajuda a decidir melhor com seu dinheiro.",
       "MÉTODO S.O.M: um sistema com direção clara para pessoas comuns saírem do caos e começarem a avançar de verdade.",
       "PARCELADO NUNCA MAIS: veja quanto do seu dinheiro já está comprometido antes de parcelar, controle parcelas e saiba quando termina.",
     ],
-    highlight: true, // MAIS POPULAR
+    highlight: true,
   },
 ];
 
 /* =========================
    DEPOIMENTOS (avatares JPG)
-   - coloque na pasta public: maria.jpg, breno.jpg, paulo.jpg
 ========================= */
 const testimonials = [
   {
@@ -193,7 +191,6 @@ export default function App() {
 
   /* =========================
      TELA 1 (Entrada) com MOCKUP
-     - imagem public/mockup.png
   ========================= */
   if (stage === "hook") {
     return (
@@ -277,10 +274,6 @@ export default function App() {
 
 /* =========================
    PÁGINA DE OFERTAS
-   - contador 10 minutos
-   - topo: SOMENTE planilha (planilha.png)
-   - cards embaixo
-   - garantia + depoimentos com JPG
 ========================= */
 function OffersPage({ totalScore, maxScore }) {
   const time = useCountdown(10 * 60);
@@ -295,14 +288,12 @@ function OffersPage({ totalScore, maxScore }) {
   return (
     <div style={styles.page}>
       <div style={{ ...styles.card, padding: 18 }}>
-        {/* Contador */}
         <div style={offersStyles.timerWrap}>
           <div style={offersStyles.timerText}>
             GARANTA AGORA COM DESCONTO <span style={offersStyles.timer}>{time}</span>
           </div>
         </div>
 
-        {/* Topo: Planilha (somente imagem) */}
         <div style={offersStyles.heroSoloWrap}>
           <img
             src="/planilha.png"
@@ -314,7 +305,6 @@ function OffersPage({ totalScore, maxScore }) {
           />
         </div>
 
-        {/* Cabeçalho */}
         <div style={{ textAlign: "center", marginTop: 14 }}>
           <div style={offersStyles.headerTag}>ESCOLHA SUA MELHOR OPÇÃO</div>
           <div style={offersStyles.headerTitle}>Seu diagnóstico está pronto ✅</div>
@@ -326,14 +316,12 @@ function OffersPage({ totalScore, maxScore }) {
           </div>
         </div>
 
-        {/* Cards */}
         <div style={offersStyles.grid}>
           {offers.map((o, idx) => (
             <OfferCard key={idx} offer={o} />
           ))}
         </div>
 
-        {/* Garantia */}
         <img
           src="/garantia.png"
           alt="Garantia 30 dias"
@@ -343,7 +331,6 @@ function OffersPage({ totalScore, maxScore }) {
           }}
         />
 
-        {/* Depoimentos */}
         <div style={{ marginTop: 18 }}>
           <h3 style={offersStyles.h3}>RELATOS DE QUEM ADQUIRIU</h3>
           {testimonials.map((t, i) => (
@@ -360,6 +347,18 @@ function OfferCard({ offer }) {
     ? { ...offersStyles.card, ...offersStyles.cardHighlight }
     : offersStyles.card;
 
+  // ✅ FUNÇÃO: repassa UTMs + qualquer parâmetro (fbclid, gclid etc.) pro checkout
+  function goToCheckout() {
+    const params = window.location.search; // "?utm_source=...&utm_campaign=...&fbclid=..."
+    const baseUrl = offer.url;
+
+    const finalUrl = params
+      ? baseUrl + (baseUrl.includes("?") ? "&" : "?") + params.slice(1)
+      : baseUrl;
+
+    window.location.href = finalUrl;
+  }
+
   return (
     <div style={cardStyle}>
       {offer.highlight && <div style={offersStyles.popular}>MAIS POPULAR</div>}
@@ -367,14 +366,12 @@ function OfferCard({ offer }) {
       <div style={offersStyles.cardTitle}>{offer.title}</div>
       <div style={offersStyles.cardSubtitle}>{offer.subtitle}</div>
 
-      {/* Imagem do card (9:16) */}
       <div style={offersStyles.cardImageWrap}>
         <img
           src={offer.image}
           alt={offer.title}
           style={offersStyles.cardImage}
           onError={(e) => {
-            // se a imagem não existir, não quebra o layout
             e.currentTarget.style.display = "none";
           }}
         />
@@ -385,7 +382,6 @@ function OfferCard({ offer }) {
         <div style={offersStyles.newPrice}>Por: {offer.newPrice}</div>
       </div>
 
-      {/* Bullets (sem cortar texto) */}
       {offer.bullets?.length > 0 && (
         <ul style={offersStyles.bullets}>
           {offer.bullets.map((b, i) => (
@@ -396,10 +392,7 @@ function OfferCard({ offer }) {
         </ul>
       )}
 
-      <button
-        style={offersStyles.buyBtn}
-        onClick={() => (window.location.href = offer.url)}
-      >
+      <button style={offersStyles.buyBtn} onClick={goToCheckout}>
         Quero esse
       </button>
     </div>
@@ -415,7 +408,6 @@ function Testimonial({ text, name, role, avatar }) {
           alt={name}
           style={offersStyles.avatar}
           onError={(e) => {
-            // fallback simples
             e.currentTarget.style.display = "none";
           }}
         />
@@ -454,7 +446,6 @@ const styles = {
     padding: "26px 22px",
   },
 
-  // entrada (mockup)
   mockWrap: {
     width: "100%",
     maxWidth: 520,
@@ -498,7 +489,6 @@ const styles = {
     cursor: "pointer",
   },
 
-  // quiz
   topRow: {
     display: "flex",
     justifyContent: "space-between",
@@ -569,7 +559,6 @@ const offersStyles = {
     fontWeight: 900,
   },
 
-  // Topo só planilha
   heroSoloWrap: {
     width: "100%",
     maxWidth: 720,
@@ -637,7 +626,6 @@ const offersStyles = {
   cardTitle: { fontSize: 16, fontWeight: 900, color: "#0f172a" },
   cardSubtitle: { fontSize: 12, color: "#64748b", marginTop: 4 },
 
-  // ✅ 9:16 (vertical) igual as imagens
   cardImageWrap: {
     width: "100%",
     marginTop: 10,
